@@ -1,4 +1,19 @@
 
+### What this script does not provide:
+#### Introduction to Bayesian modelling in R
+#### Introduction to brms
+### See instead:
+##### Veenman, M., Stefan, A. M., & Haaf, J. M. (2023). Bayesian hierarchical modeling: An introduction and reassessment. Behavior Research Methods. https://doi.org/10.3758/s13428-023-02204-3
+##### Schad, D. J., Betancourt, M., & Vasishth, S. (2021). Toward a principled Bayesian workflow in cognitive science. Psychological Methods, 26(1), 103–126. https://doi.org/10.1037/met0000275
+##### Bruno Nicenboim, Daniel J. Schad, and Shravan Vasishth (2025). Introduction to Bayesian Data Analysis for Cognitive Science: https://bruno.nicenboim.me/bayescogsci/
+##### Nalborczyk, L., Batailler, C., Lœvenbruck, H., Vilain, A., & Bürkner, P.-C. (2019). An Introduction to Bayesian Multilevel Models Using brms: A Case Study of Gender Effects on Vowel Variability in Standard Indonesian. Journal of Speech, Language, and Hearing Research, 62(5), 1225–1242. https://doi.org/10.1044/2018_JSLHR-S-18-0006
+
+
+##----------------------------------------------------------------
+##                        Setup and Data                         -
+##----------------------------------------------------------------
+
+
 library("tidyverse")
 theme_set(theme_bw(base_size = 15) + 
             theme(legend.position="bottom", 
@@ -29,7 +44,7 @@ p1 <- dl %>%
   ggbeeswarm::geom_quasirandom(alpha = 0.3) +
   stat_summary(colour = "red")
 
-## three change probabilities: .15,.3,.5,.7,.85
+## five change probabilities (in reverse order): .15,.3,.5,.7,.85
 p2 <- dl %>% 
   group_by(Subj, change_prob) %>% 
   summarise(acc = mean(ACC)) %>% 
@@ -46,7 +61,8 @@ p3 <- dl %>%
   ggplot(aes(x = factor(SetSize), y = resp)) +
   ggbeeswarm::geom_quasirandom(alpha = 0.3) +
   stat_summary(colour = "red") +
-  facet_wrap(vars(CorrResp))
+  facet_wrap(vars(CorrResp)) +
+  labs(y = "Pr('Change')")
 
 p4 <- dl %>% 
   group_by(Subj, CorrResp, change_prob) %>% 
@@ -54,7 +70,8 @@ p4 <- dl %>%
   ggplot(aes(x = change_prob, y = resp)) +
   ggbeeswarm::geom_quasirandom(alpha = 0.3) +
   stat_summary(colour = "red") +
-  facet_wrap(vars(CorrResp))
+  facet_wrap(vars(CorrResp)) +
+  labs(y = "Pr('Change')")
 p3/p4
 
 ##---------------------------------------------------------------
@@ -81,6 +98,8 @@ fit_slot <- brm(
 save(fit_slot, file = "fit-slot.rda", compress = "xz")
 load("fit-slot.rda")
 fit_slot
+
+plot(fit_slot)
 
 emmeans(fit_slot, "change_prob", dpar = "g", type = "response")
 emmeans(fit_slot, "1", dpar = "mu", type = "response")
@@ -117,13 +136,14 @@ fit_slot2_1 <- brm(
   ), data = dl,
   family = slots2, stanvars = stanvars_slots2
 )
-fit_slot2_1
 save(fit_slot2_1, file = "fit-slot2-1.rda", compress = "xz")
 load("fit-slot2-1.rda")
+fit_slot2_1
+
+plot(fit_slot2_1)
 
 emmeans(fit_slot2_1, "1", dpar = "mu", type = "response")
 emmeans(fit_slot2_1, "1", dpar = "a", type = "response")
-
 emmeans(fit_slot2_1, "change_prob", dpar = "g", type = "response")
 
 pred_slots2 <- posterior_epred(fit_slot2_1)
@@ -142,7 +162,8 @@ p3 <- dl %>%
                geom = "point", size = psize) +
   stat_summary(aes(y = pred2), colour = "orange", shape = 5
                , geom = "point", size = psize) +
-  facet_wrap(vars(CorrResp))
+  facet_wrap(vars(CorrResp)) +
+  labs(y = "Pr('Change')")
 
 p4 <- dl %>% 
   group_by(Subj, CorrResp, change_prob) %>% 
@@ -156,7 +177,8 @@ p4 <- dl %>%
                , geom = "point", size = psize) +
   stat_summary(aes(y = pred2), colour = "orange", shape = 5
                , geom = "point", size = psize) +
-  facet_wrap(vars(CorrResp))
+  facet_wrap(vars(CorrResp)) +
+  labs(y = "Pr('Change')")
 p3/p4
 
 pc1 <- dl %>% 
@@ -180,7 +202,24 @@ pc2 <- dl %>%
 pc1+pc2
 
 
-#######
+
+##-------------------------
+##  Trial-wise predictors  
+##-------------------------
+
+## One downside of current approach is that it is *very* inefficient
+## we need to evaluate Bernoulli likelihood 46,800 times, nrow(dl)
+## when we could evaluate binomial distribution N * condition times,
+## 20 * 3 * 5 = 300 times
+## However, this would require preparing data differently and a different model
+## Instead of each observation one trial, each observation would be the 
+## binomial for each participant-condition combination
+## this would require an additional variable to be passed to the likelihood function
+## and thus is left as an exericse to the reader ;)
+
+## The benefit of the current approach is that it allows to include trial-level predictors!
+## Or crossed-random effects (not possible here, as there is no item information available)
+
 dl
 
 dl %>% 
@@ -214,7 +253,7 @@ fit_slot2_2 <- brm(
   ), data = dl,
   family = slots2, stanvars = stanvars_slots2
 )
-fit_slot2_2
+
 save(fit_slot2_2, file = "fit-slot2-2.rda", compress = "xz")
 load("fit-slot2-2.rda")
-
+fit_slot2_2
