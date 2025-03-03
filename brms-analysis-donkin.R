@@ -2,12 +2,12 @@
 ### What this script does not provide:
 #### Introduction to Bayesian modelling in R
 #### Introduction to brms
+#### Usage of Bayes factors (because I generally recommend against using them)
 ### See instead:
-##### Veenman, M., Stefan, A. M., & Haaf, J. M. (2023). Bayesian hierarchical modeling: An introduction and reassessment. Behavior Research Methods. https://doi.org/10.3758/s13428-023-02204-3
+##### Veenman, M., Stefan, A. M., & Haaf, J. M. (2023). Bayesian hierarchical modeling: An introduction and reassessment. Behavior Research Methods. https://doi.org/10.3758/s13428-023-02204-3 [be aware: Bayes factor proponents]
 ##### Schad, D. J., Betancourt, M., & Vasishth, S. (2021). Toward a principled Bayesian workflow in cognitive science. Psychological Methods, 26(1), 103–126. https://doi.org/10.1037/met0000275
 ##### Bruno Nicenboim, Daniel J. Schad, and Shravan Vasishth (2025). Introduction to Bayesian Data Analysis for Cognitive Science: https://bruno.nicenboim.me/bayescogsci/
 ##### Nalborczyk, L., Batailler, C., Lœvenbruck, H., Vilain, A., & Bürkner, P.-C. (2019). An Introduction to Bayesian Multilevel Models Using brms: A Case Study of Gender Effects on Vowel Variability in Standard Indonesian. Journal of Speech, Language, and Hearing Research, 62(5), 1225–1242. https://doi.org/10.1044/2018_JSLHR-S-18-0006
-
 
 ##----------------------------------------------------------------
 ##                        Setup and Data                         -
