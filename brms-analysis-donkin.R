@@ -61,31 +61,31 @@ p3/p4
 ##                          Modelling                           -
 ##---------------------------------------------------------------
 
+
+##---------------
+##  Slots Model  
+##---------------
+
 source("slots-model-brms.R")
 
+options(contrasts=c('contr.equalprior_deviations', 'contr.poly'))
 fit_slot <- brm(
   brmsformula(
-    keyIdx | vint(CorrResp, SetSize) ~ 1 + (1|p|Subj),
-    g ~ 1 + (1|p|Subj)
+    keyIdx | vint(CorrResp, SetSize) ~ 1 + (1|p|Subj), ## formula for first model parameter (m)
+    ## because set size is part of m, only RI necessary
+    g ~ change_prob + (change_prob|p|Subj) ## for g, we need effect of change probability
+    ## "p" in between "|" indicates that we estimate correlations for random terms across terms 
   ), data = dl,
   family = slots, stanvars = stanvars_slots
 )
+save(fit_slot, file = "fit-slot.rda", compress = "xz")
+load("fit-slot.rda")
 fit_slot
 
-options(contrasts=c('contr.equalprior_deviations', 'contr.poly'))
-fit_slot_2 <- brm(
-  brmsformula(
-    keyIdx | vint(CorrResp, SetSize) ~ 1 + (1|p|Subj),
-    g ~ change_prob + (change_prob|p|Subj)
-  ), data = dl,
-  family = slots, stanvars = stanvars_slots
-)
-fit_slot_2
+emmeans(fit_slot, "change_prob", dpar = "g", type = "response")
+emmeans(fit_slot, "1", dpar = "mu", type = "response")
 
-emmeans(fit_slot_2, "change_prob", dpar = "g", type = "response")
-emmeans(fit_slot_2, "1", dpar = "mu", type = "response")
-
-pred_slots <- posterior_epred(fit_slot_2)
+pred_slots <- posterior_epred(fit_slot)
 str(pred_slots)
 
 dl$pred_slots <- apply(pred_slots, 2, mean)
@@ -103,6 +103,9 @@ dl %>%
   facet_grid(rows = vars(SetSize, CorrResp), cols = vars(change_prob))
 
 
+##------------------------------
+##  Slots Model with Attention  
+##------------------------------
 
 source("slots2-model-brms.R")
 
@@ -116,6 +119,7 @@ fit_slot2_1 <- brm(
 )
 fit_slot2_1
 save(fit_slot2_1, file = "fit-slot2-1.rda", compress = "xz")
+load("fit-slot2-1.rda")
 
 emmeans(fit_slot2_1, "1", dpar = "mu", type = "response")
 emmeans(fit_slot2_1, "1", dpar = "a", type = "response")
@@ -212,3 +216,5 @@ fit_slot2_2 <- brm(
 )
 fit_slot2_2
 save(fit_slot2_2, file = "fit-slot2-2.rda", compress = "xz")
+load("fit-slot2-2.rda")
+
