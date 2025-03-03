@@ -22,6 +22,7 @@ library("brms")
 options(mc.cores = parallel::detectCores())
 library("patchwork")
 library("bayestestR")
+options(contrasts=c('contr.equalprior_deviations', 'contr.poly'))
 library("emmeans")
 
 ## data from: https://www2.psy.unsw.edu.au/Users/CDonkin/data.htm
@@ -83,9 +84,10 @@ p3/p4
 ##  Slots Model  
 ##---------------
 
+# set up custom brms family:
+# https://cran.r-project.org/web/packages/brms/vignettes/brms_customfamilies.html
 source("slots-model-brms.R")
 
-options(contrasts=c('contr.equalprior_deviations', 'contr.poly'))
 fit_slot <- brm(
   brmsformula(
     keyIdx | vint(CorrResp, SetSize) ~ 1 + (1|p|Subj), ## formula for first model parameter (m)
