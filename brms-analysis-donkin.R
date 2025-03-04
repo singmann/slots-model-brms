@@ -88,6 +88,10 @@ p3/p4
 # https://cran.r-project.org/web/packages/brms/vignettes/brms_customfamilies.html
 source("slots-model-brms.R")
 
+## set a prior 
+slot_prior <- set_prior("student_t(3, 1.25, 1)", class = "Intercept") +
+  set_prior("logistic(0,1)", class = "Intercept", dpar = "g")
+
 fit_slot <- brm(
   brmsformula(
     keyIdx | vint(CorrResp, SetSize) ~ 1 + (1|p|Subj), ## formula for first model parameter (m)
@@ -95,7 +99,8 @@ fit_slot <- brm(
     g ~ change_prob + (change_prob|p|Subj) ## for g, we need effect of change probability
     ## "p" in between "|" indicates that we estimate correlations for random terms across terms 
   ), data = dl,
-  family = slots, stanvars = stanvars_slots
+  family = slots, stanvars = stanvars_slots, 
+  prior = slot_prior
 )
 save(fit_slot, file = "fit-slot.rda", compress = "xz")
 load("fit-slot.rda")
@@ -136,7 +141,8 @@ fit_slot2_1 <- brm(
     g ~ change_prob + (change_prob|p|Subj),
     a ~ 1 + (1|p|Subj)
   ), data = dl,
-  family = slots2, stanvars = stanvars_slots2
+  family = slots2, stanvars = stanvars_slots2,
+  prior = slot_prior
 )
 save(fit_slot2_1, file = "fit-slot2-1.rda", compress = "xz")
 load("fit-slot2-1.rda")
@@ -212,7 +218,7 @@ pc1+pc2
 ## One downside of current approach is that it is *very* inefficient
 ## we need to evaluate Bernoulli likelihood 46,800 times, nrow(dl)
 ## when we could evaluate binomial distribution N * condition times,
-## 20 * 3 * 5 = 300 times
+## 20 * 3 * 5 * 2 = 600 times
 ## However, this would require preparing data differently and a different model
 ## Instead of each observation one trial, each observation would be the 
 ## binomial for each participant-condition combination
