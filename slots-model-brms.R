@@ -18,7 +18,8 @@ slots <- custom_family(
   "slots", dpars = c("mu", "g"),
   links = c("log", "logit"),
   lb = c(0, 0), ub = c(NA, 1),
-  type = "int", vars = c("vint1[n]", "vint2[n]")
+  type = "int", 
+  vars = c("vint1[n]", "vint2[n]") ## type and setsize, which are needed in the model
 )
 
 stan_funs_slots <- "

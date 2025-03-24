@@ -218,12 +218,13 @@ pc1+pc2
 ## One downside of current approach is that it is *very* inefficient
 ## we need to evaluate Bernoulli likelihood 46,800 times, nrow(dl)
 ## when we could evaluate binomial distribution N * condition times,
-## 20 * 3 * 5 * 2 = 600 times
+## 20 * 3 * 5 * 2 = 600 times 
+## (20 participants, 3 set sizes, 5 change probabilities, 2 item types (hits & FAs))
 ## However, this would require preparing data differently and a different model
 ## Instead of each observation one trial, each observation would be the 
 ## binomial for each participant-condition combination
 ## this would require an additional variable to be passed to the likelihood function
-## and thus is left as an exericse to the reader ;)
+## and thus is left as an exercise to the reader ;)
 
 ## The benefit of the current approach is that it allows to include trial-level predictors!
 ## Or crossed-random effects (not possible here, as there is no item information available)
